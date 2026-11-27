@@ -19,8 +19,9 @@ builder.Services.AddHttpClient();
 var postgresConn = builder.Configuration.GetConnectionString("PostgresConnection");
 if (!string.IsNullOrEmpty(postgresConn))
 {
+    var normalizedConn = NormalizePostgresConnectionString(postgresConn);
     builder.Services.AddDbContext<GarmentDbContextBase, GarmentServerDbContext>(options =>
-        options.UseNpgsql(postgresConn));
+        options.UseNpgsql(normalizedConn));
 }
 else
 {
@@ -66,8 +67,15 @@ var app = builder.Build();
 // Ensure DB Created and Seeded on Startup
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<GarmentDbContextBase>();
-    await DatabaseSeeder.SeedInitialDataAsync(db);
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<GarmentDbContextBase>();
+        await DatabaseSeeder.SeedInitialDataAsync(db);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[Startup Warning] Database seeding deferred or error: {ex.Message}");
+    }
 }
 
 app.UseCors();
@@ -86,3 +94,41 @@ app.MapGet("/", () => Results.Ok(new
 }));
 
 app.Run();
+
+static string NormalizePostgresConnectionString(string connectionString)
+{
+    if (string.IsNullOrWhiteSpace(connectionString)) return connectionString;
+    if (!connectionString.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase) &&
+        !connectionString.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase))
+    {
+        return connectionString;
+    }
+
+    try
+    {
+        var uri = new Uri(connectionString);
+        var userInfo = uri.UserInfo.Split(':');
+        var username = userInfo.Length > 0 ? Uri.UnescapeDataString(userInfo[0]) : string.Empty;
+        var password = userInfo.Length > 1 ? Uri.UnescapeDataString(userInfo[1]) : string.Empty;
+        var database = uri.AbsolutePath.TrimStart('/');
+        var host = uri.Host;
+        var port = uri.Port > 0 ? uri.Port : 5432;
+
+        var builder = new Npgsql.NpgsqlConnectionStringBuilder
+        {
+            Host = host,
+            Port = port,
+            Database = database,
+            Username = username,
+            Password = password,
+            SslMode = Npgsql.SslMode.Prefer,
+            TrustServerCertificate = true
+        };
+
+        return builder.ConnectionString;
+    }
+    catch
+    {
+        return connectionString;
+    }
+}
