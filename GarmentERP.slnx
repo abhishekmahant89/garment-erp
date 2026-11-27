@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/GarmentERP.Api/GarmentERP.Api.csproj" />
+    <Project Path="src/GarmentERP.Application/GarmentERP.Application.csproj" />
+    <Project Path="src/GarmentERP.Desktop/GarmentERP.Desktop.csproj" />
+    <Project Path="src/GarmentERP.Domain/GarmentERP.Domain.csproj" />
+    <Project Path="src/GarmentERP.Infrastructure/GarmentERP.Infrastructure.csproj" />
+    <Project Path="src/GarmentERP.Reporting/GarmentERP.Reporting.csproj" />
+    <Project Path="src/GarmentERP.Shared/GarmentERP.Shared.csproj" />
+    <Project Path="src/GarmentERP.SyncService/GarmentERP.SyncService.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/GarmentERP.Tests/GarmentERP.Tests.csproj" />
+  </Folder>
+</Solution>

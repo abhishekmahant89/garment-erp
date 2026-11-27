@@ -1,0 +1,1374 @@
+﻿<Window x:Class="GarmentERP.Desktop.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:GarmentERP.Desktop.ViewModels"
+        mc:Ignorable="d"
+        Title="Garment Store POS &amp; Retail ERP — Enterprise System"
+        Height="850" Width="1380"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
+        Background="#0F172A"
+        FontFamily="Segoe UI"
+        KeyDown="Window_KeyDown">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+        <!-- ========================================================= -->
+        <!-- MODERN HIGH-CONTRAST DARK THEME STYLES                   -->
+        <!-- ========================================================= -->
+
+        <!-- 1. DataGrid Column Header Style -->
+        <Style x:Key="ModernDataGridColumnHeader" TargetType="{x:Type DataGridColumnHeader}">
+            <Setter Property="Background" Value="#1E293B"/>
+            <Setter Property="Foreground" Value="#F8FAFC"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="BorderThickness" Value="0,0,1,1"/>
+            <Setter Property="BorderBrush" Value="#334155"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type DataGridColumnHeader}">
+                        <Border Background="#1E293B" BorderBrush="#334155" BorderThickness="0,0,1,1" Padding="10,8">
+                            <ContentPresenter TextBlock.Foreground="#F8FAFC" TextBlock.FontWeight="Bold" TextBlock.FontSize="11" HorizontalAlignment="Left" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#334155"/>
+                    <Setter Property="Foreground" Value="#FFFFFF"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- 2. Global DataGrid Style -->
+        <Style TargetType="{x:Type DataGrid}">
+            <Setter Property="Background" Value="#0F172A"/>
+            <Setter Property="RowBackground" Value="#1E293B"/>
+            <Setter Property="AlternatingRowBackground" Value="#162032"/>
+            <Setter Property="Foreground" Value="#F8FAFC"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="#334155"/>
+            <Setter Property="VerticalGridLinesBrush" Value="Transparent"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+            <Setter Property="CanUserAddRows" Value="False"/>
+            <Setter Property="AutoGenerateColumns" Value="False"/>
+            <Setter Property="ColumnHeaderStyle" Value="{StaticResource ModernDataGridColumnHeader}"/>
+        </Style>
+
+        <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource ModernDataGridColumnHeader}"/>
+
+        <!-- 3. Global Dark ScrollBar Style -->
+        <Style TargetType="{x:Type ScrollBar}">
+            <Setter Property="Background" Value="#0F172A"/>
+            <Setter Property="Foreground" Value="#334155"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ScrollBar}">
+                        <Grid Background="#0F172A">
+                            <Track x:Name="PART_Track" IsDirectionReversed="true">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static ScrollBar.LineUpCommand}" Opacity="0" Focusable="False" Height="0" Width="0"/>
+                                </Track.DecreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb>
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="{x:Type Thumb}">
+                                                <Border Background="#475569" CornerRadius="4" Margin="2"/>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="Background" Value="#64748B"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsDragging" Value="True">
+                                                        <Setter Property="Background" Value="#94A3B8"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static ScrollBar.LineDownCommand}" Opacity="0" Focusable="False" Height="0" Width="0"/>
+                                </Track.IncreaseRepeatButton>
+                            </Track>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Orientation" Value="Horizontal">
+                                <Setter Property="Height" Value="8"/>
+                                <Setter Property="MinHeight" Value="8"/>
+                                <Setter TargetName="PART_Track" Property="IsDirectionReversed" Value="false"/>
+                            </Trigger>
+                            <Trigger Property="Orientation" Value="Vertical">
+                                <Setter Property="Width" Value="8"/>
+                                <Setter Property="MinWidth" Value="8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="NavBtnStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#94A3B8"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="11,7"/>
+            <Setter Property="Margin" Value="2,0"/>
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="BorderThickness" Value="0,0,0,3"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="4,4,0,0" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="#FFFFFF"/>
+                    <Setter Property="Background" Value="#334155"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="Background" Value="#1E293B"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="16"/>
+            <Setter Property="BorderBrush" Value="#334155"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <!-- Top App Bar & Sync Header -->
+            <RowDefinition Height="60"/>
+            <!-- Module Navigation Bar -->
+            <RowDefinition Height="Auto"/>
+            <!-- Dynamic Content (POS or Module Views) -->
+            <RowDefinition Height="*"/>
+            <!-- Footer Status Bar -->
+            <RowDefinition Height="36"/>
+        </Grid.RowDefinitions>
+
+        <!-- ======================================================== -->
+        <!-- ROW 0: TOP APP BAR & LIVE SYNC / LICENSE HEADER -->
+        <!-- ======================================================== -->
+        <Border Grid.Row="0" Background="#0F172A" BorderBrush="#1E293B" BorderThickness="0,0,0,1" Padding="15,0">
+            <Grid VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Branding -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="👗 GRAND FASHION STORE" FontSize="19" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center"/>
+                    <Border Background="#1E293B" CornerRadius="4" Margin="14,0,0,0" Padding="8,4" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding CounterInfoText}" FontSize="11" Foreground="#94A3B8"/>
+                    </Border>
+                </StackPanel>
+
+                <!-- Right Header Actions & Live Sync Pill -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Content="📊 Shift Z-Report" Command="{Binding GenerateShiftZReportCommand}" Background="#334155" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="12" Padding="10,5" Margin="0,0,10,0" BorderThickness="0" Cursor="Hand"/>
+
+                    <!-- License Badge -->
+                    <Border Background="#064E3B" CornerRadius="4" Padding="10,5" Margin="0,0,10,0">
+                        <TextBlock Text="{Binding LicenseBadgeText}" FontSize="11" FontWeight="SemiBold" Foreground="#6EE7B7"/>
+                    </Border>
+
+                    <!-- POSRES DataSync Queue Pill -->
+                    <Border Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="4" Padding="10,4" Margin="0,0,10,0">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="🔄 SYNC: " FontSize="11" FontWeight="Bold" Foreground="#94A3B8" VerticalAlignment="Center"/>
+                            <TextBlock Text="Pending: " FontSize="11" Foreground="#F59E0B" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding SyncPendingCount}" FontSize="12" FontWeight="Bold" Foreground="#FCD34D" Margin="2,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Done: " FontSize="11" Foreground="#10B981" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding SyncDoneCount}" FontSize="12" FontWeight="Bold" Foreground="#6EE7B7" Margin="2,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Failed: " FontSize="11" Foreground="#EF4444" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding SyncFailedCount}" FontSize="12" FontWeight="Bold" Foreground="#FCA5A5" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Button Content="Sync Now" Command="{Binding ForceSyncCommand}" Background="#2563EB" Foreground="#FFFFFF" FontWeight="Bold" FontSize="12" Padding="12,5" BorderThickness="0" Cursor="Hand"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ======================================================== -->
+        <!-- ROW 1: MODULE NAVIGATION BAR -->
+        <!-- ======================================================== -->
+        <Border Grid.Row="1" Background="#1E293B" BorderBrush="#334155" BorderThickness="0,0,0,1" Padding="8,4" MinHeight="46">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <Button Content="🛒 POS [F2]" Command="{Binding NavigateToCommand}" CommandParameter="POS" Style="{StaticResource NavBtnStyle}" BorderBrush="#3B82F6" Foreground="#FFFFFF"/>
+                <Button Content="📊 Dashboard" Command="{Binding NavigateToCommand}" CommandParameter="DASHBOARD" Style="{StaticResource NavBtnStyle}"/>
+                <Button Content="👗 Products" Command="{Binding NavigateToCommand}" CommandParameter="PRODUCTS" Style="{StaticResource NavBtnStyle}"/>
+                <Button Content="📦 Inventory" Command="{Binding NavigateToCommand}" CommandParameter="INVENTORY" Style="{StaticResource NavBtnStyle}"/>
+                <Button Content="📥 Purchases" Command="{Binding NavigateToCommand}" CommandParameter="PURCHASES" Style="{StaticResource NavBtnStyle}"/>
+                <Button Content="🚚 Transfers" Command="{Binding NavigateToCommand}" CommandParameter="TRANSFERS" Style="{StaticResource NavBtnStyle}"/>
+                <Button Content="👥 Customers" Command="{Binding NavigateToCommand}" CommandParameter="CUSTOMERS" Style="{StaticResource NavBtnStyle}"/>
+                <Button Content="🔄 Returns" Command="{Binding NavigateToCommand}" CommandParameter="RETURNS" Style="{StaticResource NavBtnStyle}"/>
+                <Button Content="💰 Accounting" Command="{Binding NavigateToCommand}" CommandParameter="ACCOUNTING" Style="{StaticResource NavBtnStyle}"/>
+                <Button Content="📑 Reports" Command="{Binding NavigateToCommand}" CommandParameter="REPORTS" Style="{StaticResource NavBtnStyle}"/>
+                <Button Content="📡 DataSync" Command="{Binding NavigateToCommand}" CommandParameter="SYNC" Style="{StaticResource NavBtnStyle}"/>
+                <Button Content="⚙️ Settings" Command="{Binding NavigateToCommand}" CommandParameter="SETTINGS" Style="{StaticResource NavBtnStyle}"/>
+            </StackPanel>
+        </Border>
+
+        <!-- ======================================================== -->
+        <!-- ROW 2: DYNAMIC CONTENT TABS -->
+        <!-- ======================================================== -->
+        <Grid Grid.Row="2" Background="#0B132B">
+
+            <!-- ==================================================== -->
+            <!-- TAB 1: POS BILLING COUNTER VIEW -->
+            <!-- ==================================================== -->
+            <Grid Visibility="{Binding IsPosActive, Converter={StaticResource BoolToVis}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Barcode Bar with Scanner Mode Switcher -->
+                <Border Grid.Row="0" Background="#1E293B" BorderBrush="#334155" BorderThickness="0,0,0,1" Padding="15,8">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Row 0: Barcode Scan Input -->
+                        <Grid Grid.Row="0" Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0" Text="SCAN BARCODE / SKU:" FontWeight="Bold" FontSize="13" Foreground="#94A3B8" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                            <TextBox x:Name="TxtBarcode" Grid.Column="1" Text="{Binding BarcodeScanInput, UpdateSourceTrigger=PropertyChanged}" FontSize="16" FontWeight="SemiBold" Padding="10,6" VerticalContentAlignment="Center" Background="#0F172A" Foreground="#FFFFFF" BorderBrush="#475569" KeyDown="TxtBarcode_KeyDown"/>
+                            <Button Grid.Column="2" Content="+ ADD ITEM (Enter)" Command="{Binding ScanBarcodeCommand}" Background="#2563EB" Foreground="#FFFFFF" FontWeight="Bold" FontSize="13" Padding="16,7" Margin="10,0,0,0" BorderThickness="0" Cursor="Hand"/>
+                            <Button Grid.Column="3" Content="🔍 Search Item (F1)" Command="{Binding OpenProductSearchModalCommand}" Background="#334155" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="13" Padding="14,7" Margin="8,0,0,0" BorderThickness="0" Cursor="Hand" Click="BtnSearchItem_Click"/>
+                            <Button Grid.Column="4" Content="🖨 Re-print (F12)" Command="{Binding PrintLastReceiptCommand}" Background="#475569" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="13" Padding="12,7" Margin="8,0,0,0" BorderThickness="0" Cursor="Hand"/>
+                        </Grid>
+
+                        <!-- Row 1: Scanner Input Mode Switcher & Quick Demo -->
+                        <Grid Grid.Row="1" Margin="0,2,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0" Text="SCANNER SOURCE:" FontSize="11" FontWeight="Bold" Foreground="#64748B" VerticalAlignment="Center" Margin="0,0,10,0"/>
+
+                            <!-- 3-Way Mode Switch -->
+                            <Border Grid.Column="1" Background="#0F172A" CornerRadius="6" BorderBrush="#334155" BorderThickness="1" Padding="3">
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="🔫 Real USB/Laser" Command="{Binding SetScannerModeCommand}" CommandParameter="PHYSICAL"
+                                            Background="#1E293B" Foreground="#F8FAFC" FontSize="11" FontWeight="SemiBold" Padding="12,5" BorderThickness="0" Cursor="Hand"/>
+                                    <Button Content="📱 Android WiFi Scanner" Command="{Binding SetScannerModeCommand}" CommandParameter="MOBILE"
+                                            Background="#064E3B" Foreground="#34D399" FontSize="11" FontWeight="Bold" Padding="12,5" BorderThickness="0" Cursor="Hand" Margin="4,0"/>
+                                    <Button Content="⚡ Demo Mode" Command="{Binding SetScannerModeCommand}" CommandParameter="DEMO"
+                                            Background="#1E3A8A" Foreground="#93C5FD" FontSize="11" FontWeight="SemiBold" Padding="12,5" BorderThickness="0" Cursor="Hand"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Quick Demo Scans Bar (Active in Demo Mode) -->
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="14,0,0,0" Visibility="{Binding IsDemoScanner, Converter={StaticResource BoolToVis}}">
+                                <TextBlock Text="Quick Demo Scans:" FontSize="11" Foreground="#94A3B8" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <Button Content="👕 Shirt S (8900327943047)" Command="{Binding SimulateBarcodeScanCommand}" CommandParameter="8900327943047" Background="#1E293B" Foreground="#38BDF8" BorderBrush="#334155" BorderThickness="1" Padding="8,4" FontSize="11" Cursor="Hand" Margin="0,0,6,0"/>
+                                <Button Content="👕 Shirt XL (8900734656318)" Command="{Binding SimulateBarcodeScanCommand}" CommandParameter="8900734656318" Background="#1E293B" Foreground="#38BDF8" BorderBrush="#334155" BorderThickness="1" Padding="8,4" FontSize="11" Cursor="Hand" Margin="0,0,6,0"/>
+                                <Button Content="👕 Slim Fit L (8900450996935)" Command="{Binding SimulateBarcodeScanCommand}" CommandParameter="8900450996935" Background="#1E293B" Foreground="#38BDF8" BorderBrush="#334155" BorderThickness="1" Padding="8,4" FontSize="11" Cursor="Hand"/>
+                            </StackPanel>
+
+                            <!-- Mobile WiFi Setup Button & Device Status -->
+                            <StackPanel Grid.Column="3" Orientation="Horizontal">
+                                <TextBlock Text="{Binding ConnectedMobileDevice}" FontSize="11" Foreground="#34D399" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                <Button Content="📱 Pair Mobile Phone (QR Code)" Command="{Binding OpenMobileScannerSetupCommand}" Background="#059669" Foreground="#FFFFFF" FontWeight="Bold" FontSize="11" Padding="14,6" BorderThickness="0" Cursor="Hand"/>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!-- Main Cart & Billing Screen -->
+                <Grid Grid.Row="1" Margin="15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="380"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Cart DataGrid -->
+                    <Border Grid.Column="0" Background="#1E293B" CornerRadius="8" Padding="12" Margin="0,0,15,0" BorderBrush="#334155" BorderThickness="1">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <Grid Grid.Row="0" Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="🛒 ACTIVE BILLING CART" FontSize="14" FontWeight="Bold" Foreground="#E2E8F0" VerticalAlignment="Center"/>
+                                    <Border Background="#064E3B" CornerRadius="4" Padding="6,2" Margin="10,0,0,0" VerticalAlignment="Center" ToolTip="Every scanned item is instantly auto-saved to disk. Fully protected against power-cuts, freezes and crashes.">
+                                        <TextBlock Text="⚡ Power-Loss Protected" FontSize="10" FontWeight="Bold" Foreground="#34D399"/>
+                                    </Border>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Visibility="{Binding IsCrashRecoveredCart, Converter={StaticResource BoolToVis}}">
+                                    <Border Background="#7C2D12" CornerRadius="4" Padding="8,3" Margin="0,0,8,0" VerticalAlignment="Center">
+                                        <TextBlock Text="⚡ Unsaved Cart Restored After System Crash / Power-Cut" FontSize="11" FontWeight="Bold" Foreground="#FDBA74"/>
+                                    </Border>
+                                    <Button Content="Discard" Command="{Binding ClearCartCommand}" Background="#DC2626" Foreground="#FFFFFF" FontSize="10" FontWeight="Bold" Padding="8,3" BorderThickness="0" Cursor="Hand" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <DataGrid Grid.Row="1" ItemsSource="{Binding CartItems}" AutoGenerateColumns="False" CanUserAddRows="False" Background="#0F172A" RowBackground="#1E293B" AlternatingRowBackground="#162032" Foreground="#FFFFFF" BorderThickness="0" HeadersVisibility="Column" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#334155" ColumnHeaderStyle="{StaticResource ModernDataGridColumnHeader}">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="BARCODE" Binding="{Binding Barcode}" Width="130"/>
+                                    <DataGridTextColumn Header="PRODUCT &amp; VARIANT" Binding="{Binding DisplayTitle}" Width="*" FontWeight="SemiBold"/>
+                                    <DataGridTextColumn Header="MRP" Binding="{Binding MRP, StringFormat='₹{0:N2}'}" Width="85"/>
+                                    <DataGridTextColumn Header="PRICE" Binding="{Binding UnitPrice, StringFormat='₹{0:N2}'}" Width="85"/>
+                                    <DataGridTextColumn Header="QTY" Binding="{Binding Quantity}" Width="60"/>
+                                    <DataGridTextColumn Header="DISC" Binding="{Binding DiscountAmount, StringFormat='₹{0:N2}'}" Width="75"/>
+                                    <DataGridTextColumn Header="TOTAL" Binding="{Binding LineTotal, StringFormat='₹{0:N2}'}" Width="95" FontWeight="Bold"/>
+                                    <DataGridTemplateColumn Width="50">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Content="✕" Command="{Binding DataContext.RemoveLineItemCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" Background="Transparent" Foreground="#EF4444" FontWeight="Bold" BorderThickness="0" Cursor="Hand"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </Border>
+
+                    <!-- Right Summary Panel -->
+                    <Border Grid.Column="1" Background="#1E293B" CornerRadius="8" Padding="16" BorderBrush="#334155" BorderThickness="1">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Customer Card -->
+                            <Border Grid.Row="0" Background="#0F172A" CornerRadius="6" Padding="12" Margin="0,0,0,12" BorderBrush="#334155" BorderThickness="1">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="CUSTOMER (F5)" FontSize="10" FontWeight="Bold" Foreground="#94A3B8"/>
+                                        <TextBlock Text="{Binding CustomerName}" FontSize="14" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,2,0,0"/>
+                                        <TextBlock Text="{Binding CustomerPhone, StringFormat='Phone: {0}'}" FontSize="12" Foreground="#CBD5E1"/>
+                                        <TextBlock Text="{Binding CustomerLoyaltyPoints, StringFormat='Points: {0} pts'}" FontSize="12" Foreground="#F59E0B" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                    <Button Grid.Column="1" Content="Change" Command="{Binding OpenCustomerModalCommand}" Background="#334155" Foreground="#FFFFFF" Padding="8,4" FontSize="11" VerticalAlignment="Center" BorderThickness="0" Cursor="Hand"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- Summary Figures -->
+                            <StackPanel Grid.Row="1" Margin="0,0,0,15">
+                                <TextBlock Text="BILL SUMMARY" FontSize="12" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,8"/>
+                                <Grid Margin="0,3">
+                                    <TextBlock Text="Sub Total:" Foreground="#CBD5E1"/>
+                                    <TextBlock Text="{Binding SubTotal, StringFormat='₹{0:N2}'}" HorizontalAlignment="Right" Foreground="#FFFFFF" FontWeight="SemiBold"/>
+                                </Grid>
+                                <Grid Margin="0,3">
+                                    <TextBlock Text="Discount (F4):" Foreground="#CBD5E1"/>
+                                    <TextBlock Text="{Binding InvoiceDiscount, StringFormat='-₹{0:N2}'}" HorizontalAlignment="Right" Foreground="#EF4444" FontWeight="SemiBold"/>
+                                </Grid>
+                                <Grid Margin="0,3">
+                                    <TextBlock Text="Apparel GST (5%/12%):" Foreground="#CBD5E1"/>
+                                    <TextBlock Text="{Binding TaxAmount, StringFormat='₹{0:N2}'}" HorizontalAlignment="Right" Foreground="#FFFFFF" FontWeight="SemiBold"/>
+                                </Grid>
+                                <Grid Margin="0,3">
+                                    <TextBlock Text="Round Off:" Foreground="#CBD5E1"/>
+                                    <TextBlock Text="{Binding RoundOff, StringFormat='₹{0:N2}'}" HorizontalAlignment="Right" Foreground="#94A3B8"/>
+                                </Grid>
+                                <Border Height="1" Background="#334155" Margin="0,8"/>
+                                <Grid Margin="0,4">
+                                    <TextBlock Text="GRAND TOTAL:" FontSize="16" FontWeight="Bold" Foreground="#10B981" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding GrandTotal, StringFormat='₹{0:N2}'}" FontSize="24" FontWeight="Bold" Foreground="#10B981" HorizontalAlignment="Right"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <!-- Action Buttons -->
+                            <StackPanel Grid.Row="3">
+                                <Button Content="⚡ QUICK CASH BILL (F10)" Command="{Binding QuickCashCheckoutCommand}" Background="#059669" Foreground="#FFFFFF" FontSize="16" FontWeight="Bold" Padding="0,14" Margin="0,0,0,8" BorderThickness="0" Cursor="Hand"/>
+                                <Button Content="💳 SPLIT / UPI / CARD (F9)" Command="{Binding OpenSplitPaymentModalCommand}" Background="#2563EB" Foreground="#FFFFFF" FontSize="15" FontWeight="Bold" Padding="0,12" Margin="0,0,0,8" BorderThickness="0" Cursor="Hand"/>
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Button Grid.Column="0" Content="⏸ Hold Bill (F6)" Command="{Binding HoldCurrentBillCommand}" Background="#334155" Foreground="#FFFFFF" FontWeight="SemiBold" Padding="0,8" Margin="0,0,4,0" BorderThickness="0" Cursor="Hand"/>
+                                    <Button Grid.Column="1" Content="▶ Resume (F7)" Command="{Binding OpenHeldBillsModalCommand}" Background="#334155" Foreground="#FFFFFF" FontWeight="SemiBold" Padding="0,8" Margin="4,0,0,0" BorderThickness="0" Cursor="Hand"/>
+                                </Grid>
+                                <Button Content="✕ Clear Active Cart" Command="{Binding ClearCartCommand}" Background="#475569" Foreground="#FCA5A5" FontWeight="SemiBold" Padding="0,6" BorderThickness="0" Cursor="Hand"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Grid>
+
+            <!-- ==================================================== -->
+            <!-- TAB 2: DASHBOARD VIEW -->
+            <!-- ==================================================== -->
+            <Grid Visibility="{Binding IsDashboardActive, Converter={StaticResource BoolToVis}}" Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="📊 Store Performance &amp; Realtime KPI Dashboard" FontSize="20" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,0,0,15"/>
+
+                <!-- 6 Metric Cards -->
+                <Grid Grid.Row="1" Margin="0,0,0,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,8,0">
+                        <StackPanel>
+                            <TextBlock Text="TODAY SALES" FontSize="11" FontWeight="Bold" Foreground="#94A3B8"/>
+                            <TextBlock Text="{Binding DashTodaySales, StringFormat='₹{0:N2}'}" FontSize="20" FontWeight="Bold" Foreground="#10B981" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="1" Style="{StaticResource CardStyle}" Margin="4,0,8,0">
+                        <StackPanel>
+                            <TextBlock Text="INVOICES BILLED" FontSize="11" FontWeight="Bold" Foreground="#94A3B8"/>
+                            <TextBlock Text="{Binding DashInvoiceCount}" FontSize="20" FontWeight="Bold" Foreground="#38BDF8" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="2" Style="{StaticResource CardStyle}" Margin="4,0,8,0">
+                        <StackPanel>
+                            <TextBlock Text="ITEMS SOLD" FontSize="11" FontWeight="Bold" Foreground="#94A3B8"/>
+                            <TextBlock Text="{Binding DashItemsSold}" FontSize="20" FontWeight="Bold" Foreground="#A78BFA" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="3" Style="{StaticResource CardStyle}" Margin="4,0,8,0">
+                        <StackPanel>
+                            <TextBlock Text="CASH COLLECTION" FontSize="11" FontWeight="Bold" Foreground="#94A3B8"/>
+                            <TextBlock Text="{Binding DashCashCollection, StringFormat='₹{0:N2}'}" FontSize="20" FontWeight="Bold" Foreground="#FBBF24" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="4" Style="{StaticResource CardStyle}" Margin="4,0,8,0">
+                        <StackPanel>
+                            <TextBlock Text="UPI / DIGITAL" FontSize="11" FontWeight="Bold" Foreground="#94A3B8"/>
+                            <TextBlock Text="{Binding DashUpiCollection, StringFormat='₹{0:N2}'}" FontSize="20" FontWeight="Bold" Foreground="#34D399" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="5" Style="{StaticResource CardStyle}" Margin="4,0,0,0">
+                        <StackPanel>
+                            <TextBlock Text="LOW STOCK ALERTS" FontSize="11" FontWeight="Bold" Foreground="#94A3B8"/>
+                            <TextBlock Text="{Binding DashLowStockAlerts}" FontSize="20" FontWeight="Bold" Foreground="#F87171" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- Recent Sales Table -->
+                <Border Grid.Row="2" Style="{StaticResource CardStyle}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Recent Invoices Today" FontSize="14" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,0,0,10"/>
+                        <DataGrid Grid.Row="1" ItemsSource="{Binding DashRecentSales}" AutoGenerateColumns="False" CanUserAddRows="False" Background="#0F172A" RowBackground="#1E293B" AlternatingRowBackground="#162032" Foreground="#FFFFFF" BorderThickness="0" HeadersVisibility="Column" ColumnHeaderStyle="{StaticResource ModernDataGridColumnHeader}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="INVOICE #" Binding="{Binding InvoiceNumber}" Width="160" FontWeight="SemiBold"/>
+                                <DataGridTextColumn Header="DATE / TIME" Binding="{Binding CreatedAtUtc, StringFormat='dd-MM-yyyy HH:mm'}" Width="150"/>
+                                <DataGridTextColumn Header="ITEMS" Binding="{Binding Items.Count}" Width="80"/>
+                                <DataGridTextColumn Header="SUBTOTAL" Binding="{Binding SubTotal, StringFormat='₹{0:N2}'}" Width="100"/>
+                                <DataGridTextColumn Header="TAX" Binding="{Binding TaxAmount, StringFormat='₹{0:N2}'}" Width="100"/>
+                                <DataGridTextColumn Header="TOTAL AMOUNT" Binding="{Binding TotalAmount, StringFormat='₹{0:N2}'}" Width="120" FontWeight="Bold"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- ==================================================== -->
+            <!-- TAB 3: PRODUCTS & 25-VARIANT MATRIX VIEW -->
+            <!-- ==================================================== -->
+            <Grid Visibility="{Binding IsProductsActive, Converter={StaticResource BoolToVis}}" Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0" Margin="0,0,0,15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="👗 Product Catalog &amp; Parent-Variant Architecture" FontSize="20" FontWeight="Bold" Foreground="#FFFFFF"/>
+                        <TextBlock Text="Each garment variant has its own unique SKU, EAN-13 barcode, and independent inventory." FontSize="12" Foreground="#94A3B8" Margin="0,4,0,0"/>
+                    </StackPanel>
+                    <Button Grid.Column="1" Content="✨ Generate 25-Variant Matrix (5 Sizes × 5 Colors)" Command="{Binding Generate25VariantMatrixCommand}" Background="#7C3AED" Foreground="#FFFFFF" FontWeight="Bold" Padding="16,8" BorderThickness="0" Cursor="Hand"/>
+                </Grid>
+
+                <TextBlock Grid.Row="1" Text="{Binding MatrixGenStatus}" Foreground="#34D399" FontWeight="SemiBold" Margin="0,0,0,10"/>
+
+                <Border Grid.Row="2" Style="{StaticResource CardStyle}">
+                    <DataGrid ItemsSource="{Binding CatalogVariants}" AutoGenerateColumns="False" CanUserAddRows="False" Background="#0F172A" RowBackground="#1E293B" AlternatingRowBackground="#162032" Foreground="#FFFFFF" BorderThickness="0" HeadersVisibility="Column" ColumnHeaderStyle="{StaticResource ModernDataGridColumnHeader}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="SKU" Binding="{Binding SKU}" Width="140" FontWeight="SemiBold"/>
+                            <DataGridTextColumn Header="EAN-13 BARCODE" Binding="{Binding Barcode}" Width="140"/>
+                            <DataGridTextColumn Header="PRODUCT" Binding="{Binding ProductName}" Width="*"/>
+                            <DataGridTextColumn Header="SIZE" Binding="{Binding SizeName}" Width="70"/>
+                            <DataGridTextColumn Header="COLOR" Binding="{Binding ColorName}" Width="90"/>
+                            <DataGridTextColumn Header="PURCHASE" Binding="{Binding PurchasePrice, StringFormat='₹{0:N2}'}" Width="95"/>
+                            <DataGridTextColumn Header="SELLING" Binding="{Binding SellingPrice, StringFormat='₹{0:N2}'}" Width="95"/>
+                            <DataGridTextColumn Header="MRP" Binding="{Binding MRP, StringFormat='₹{0:N2}'}" Width="95"/>
+                            <DataGridTextColumn Header="STOCK" Binding="{Binding StockQty}" Width="80" FontWeight="Bold"/>
+                            <DataGridTemplateColumn Header="BARCODE LABEL" Width="115">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="🏷 Print Barcode" Command="{Binding DataContext.OpenBarcodeLabelModalCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" Background="#1E293B" Foreground="#38BDF8" BorderBrush="#334155" BorderThickness="1" Padding="6,3" FontSize="11" FontWeight="SemiBold" Cursor="Hand"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Border>
+            </Grid>
+
+            <!-- ==================================================== -->
+            <!-- TAB 4: INVENTORY VIEW -->
+            <!-- ==================================================== -->
+            <Grid Visibility="{Binding IsInventoryActive, Converter={StaticResource BoolToVis}}" Margin="20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="340"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,15,0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="📦 Multi-Location Inventory Balances" FontSize="16" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,0,0,10"/>
+                        <DataGrid Grid.Row="1" ItemsSource="{Binding InventoryStockItems}" SelectedItem="{Binding SelectedInventoryItem}" AutoGenerateColumns="False" CanUserAddRows="False" Background="#0F172A" RowBackground="#1E293B" Foreground="#FFFFFF" BorderThickness="0" HeadersVisibility="Column" ColumnHeaderStyle="{StaticResource ModernDataGridColumnHeader}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="BARCODE" Binding="{Binding Barcode}" Width="130"/>
+                                <DataGridTextColumn Header="ITEM" Binding="{Binding ProductName}" Width="*"/>
+                                <DataGridTextColumn Header="SIZE" Binding="{Binding SizeName}" Width="60"/>
+                                <DataGridTextColumn Header="COLOR" Binding="{Binding ColorName}" Width="80"/>
+                                <DataGridTextColumn Header="STOCK QTY" Binding="{Binding StockQty}" Width="90" FontWeight="Bold"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+
+                <!-- Stock Adjustment Panel -->
+                <Border Grid.Column="1" Style="{StaticResource CardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="⚡ Stock Adjustment" FontSize="16" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,0,0,12"/>
+                        <TextBlock Text="Selected Variant:" Foreground="#94A3B8" FontSize="11"/>
+                        <TextBlock Text="{Binding SelectedInventoryItem.ProductName, FallbackValue='(Click an item on left)'}" Foreground="#FFFFFF" FontWeight="Bold" Margin="0,2,0,10"/>
+
+                        <TextBlock Text="Quantity Change (+/-):" Foreground="#94A3B8" FontSize="11"/>
+                        <TextBox Text="{Binding StockAdjustmentQty, UpdateSourceTrigger=PropertyChanged}" Background="#0F172A" Foreground="#FFFFFF" Padding="6" Margin="0,2,0,10"/>
+
+                        <TextBlock Text="Reason for Adjustment:" Foreground="#94A3B8" FontSize="11"/>
+                        <TextBox Text="{Binding StockAdjustmentReason, UpdateSourceTrigger=PropertyChanged}" Background="#0F172A" Foreground="#FFFFFF" Padding="6" Margin="0,2,0,15"/>
+
+                        <Button Content="Confirm Stock Adjustment" Command="{Binding AdjustStockCommand}" Background="#D97706" Foreground="#FFFFFF" FontWeight="Bold" Padding="0,10" BorderThickness="0" Cursor="Hand"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- ==================================================== -->
+            <!-- TAB 5: PURCHASES VIEW -->
+            <!-- ==================================================== -->
+            <Grid Visibility="{Binding IsPurchasesActive, Converter={StaticResource BoolToVis}}" Margin="20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="380"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,15,0">
+                    <StackPanel>
+                        <TextBlock Text="📥 Inward Purchase Intake (GRN)" FontSize="16" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,0,0,12"/>
+                        <TextBlock Text="Supplier:" Foreground="#94A3B8" FontSize="11"/>
+                        <ComboBox ItemsSource="{Binding SuppliersList}" SelectedItem="{Binding SelectedSupplier}" DisplayMemberPath="Name" Background="#1E293B" Foreground="#FFFFFF" BorderBrush="#475569" Padding="6" Margin="0,2,0,10"/>
+
+                        <TextBlock Text="Supplier Invoice #:" Foreground="#94A3B8" FontSize="11"/>
+                        <TextBox Text="{Binding PurchaseInvoiceNo}" Background="#0F172A" Foreground="#FFFFFF" Padding="6" Margin="0,2,0,10"/>
+
+                        <TextBlock Text="Garment Variant:" Foreground="#94A3B8" FontSize="11"/>
+                        <ComboBox ItemsSource="{Binding CatalogVariants}" SelectedItem="{Binding PurchaseSelectedVariant}" DisplayMemberPath="SKU" Background="#1E293B" Foreground="#FFFFFF" BorderBrush="#475569" Padding="6" Margin="0,2,0,10"/>
+
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Margin="0,0,4,0">
+                                <TextBlock Text="Inward Qty:" Foreground="#94A3B8" FontSize="11"/>
+                                <TextBox Text="{Binding PurchaseQty}" Background="#0F172A" Foreground="#FFFFFF" Padding="6"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Margin="4,0,0,0">
+                                <TextBlock Text="Purchase Cost:" Foreground="#94A3B8" FontSize="11"/>
+                                <TextBox Text="{Binding PurchasePrice}" Background="#0F172A" Foreground="#FFFFFF" Padding="6"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Button Content="Receive Goods &amp; Update Stock" Command="{Binding SubmitPurchaseIntakeCommand}" Background="#059669" Foreground="#FFFFFF" FontWeight="Bold" Padding="0,10" Margin="0,10,0,0" BorderThickness="0" Cursor="Hand"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Style="{StaticResource CardStyle}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Purchase Inward History" FontSize="16" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,0,0,10"/>
+                        <DataGrid Grid.Row="1" ItemsSource="{Binding PurchaseHistory}" AutoGenerateColumns="False" CanUserAddRows="False" Background="#0F172A" RowBackground="#1E293B" Foreground="#FFFFFF" BorderThickness="0" HeadersVisibility="Column" ColumnHeaderStyle="{StaticResource ModernDataGridColumnHeader}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="INVOICE #" Binding="{Binding InvoiceNumber}" Width="150" FontWeight="SemiBold"/>
+                                <DataGridTextColumn Header="SUPPLIER" Binding="{Binding SupplierName}" Width="*"/>
+                                <DataGridTextColumn Header="ITEMS" Binding="{Binding TotalItems}" Width="80"/>
+                                <DataGridTextColumn Header="TOTAL AMOUNT" Binding="{Binding TotalAmount, StringFormat='₹{0:N2}'}" Width="120" FontWeight="Bold"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- ==================================================== -->
+            <!-- TAB 6: STOCK TRANSFERS VIEW -->
+            <!-- ==================================================== -->
+            <Grid Visibility="{Binding IsTransfersActive, Converter={StaticResource BoolToVis}}" Margin="20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="380"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,15,0">
+                    <StackPanel>
+                        <TextBlock Text="🚚 Warehouse to Store Transfer" FontSize="16" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,0,0,12"/>
+                        <TextBlock Text="Select Variant to Dispatch:" Foreground="#94A3B8" FontSize="11"/>
+                        <ComboBox ItemsSource="{Binding CatalogVariants}" SelectedItem="{Binding TransferSelectedVariant}" DisplayMemberPath="SKU" Background="#1E293B" Foreground="#FFFFFF" BorderBrush="#475569" Padding="6" Margin="0,2,0,10"/>
+
+                        <TextBlock Text="Transfer Quantity:" Foreground="#94A3B8" FontSize="11"/>
+                        <TextBox Text="{Binding TransferQty}" Background="#0F172A" Foreground="#FFFFFF" Padding="6" Margin="0,2,0,10"/>
+
+                        <TextBlock Text="Transfer Notes:" Foreground="#94A3B8" FontSize="11"/>
+                        <TextBox Text="{Binding TransferNotes}" Background="#0F172A" Foreground="#FFFFFF" Padding="6" Margin="0,2,0,15"/>
+
+                        <Button Content="Dispatch Transfer" Command="{Binding DispatchTransferCommand}" Background="#2563EB" Foreground="#FFFFFF" FontWeight="Bold" Padding="0,10" BorderThickness="0" Cursor="Hand"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Style="{StaticResource CardStyle}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Stock Transfer Manifests" FontSize="16" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,0,0,10"/>
+                        <DataGrid Grid.Row="1" ItemsSource="{Binding TransferHistory}" AutoGenerateColumns="False" CanUserAddRows="False" Background="#0F172A" RowBackground="#1E293B" Foreground="#FFFFFF" BorderThickness="0" HeadersVisibility="Column" ColumnHeaderStyle="{StaticResource ModernDataGridColumnHeader}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="MANIFEST #" Binding="{Binding TransferNumber}" Width="150" FontWeight="SemiBold"/>
+                                <DataGridTextColumn Header="STATUS" Binding="{Binding Status}" Width="100"/>
+                                <DataGridTextColumn Header="ITEMS" Binding="{Binding ItemCount}" Width="80"/>
+                                <DataGridTemplateColumn Width="110">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Content="Receive" Command="{Binding DataContext.ReceiveTransferCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" Background="#059669" Foreground="#FFFFFF" Padding="6,2" BorderThickness="0" Cursor="Hand"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- ==================================================== -->
+            <!-- TAB 7: CUSTOMERS & LOYALTY VIEW -->
+            <!-- ==================================================== -->
+            <Grid Visibility="{Binding IsCustomersActive, Converter={StaticResource BoolToVis}}" Margin="20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="360"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,15,0">
+                    <StackPanel>
+                        <TextBlock Text="👥 Enroll New Customer" FontSize="16" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,0,0,12"/>
+                        <TextBlock Text="Full Name:" Foreground="#94A3B8" FontSize="11"/>
+                        <TextBox Text="{Binding NewCustomerName}" Background="#0F172A" Foreground="#FFFFFF" Padding="6" Margin="0,2,0,10"/>
+
+                        <TextBlock Text="Mobile Phone:" Foreground="#94A3B8" FontSize="11"/>
+                        <TextBox Text="{Binding NewCustomerPhone}" Background="#0F172A" Foreground="#FFFFFF" Padding="6" Margin="0,2,0,10"/>
+
+                        <TextBlock Text="Email Address:" Foreground="#94A3B8" FontSize="11"/>
+                        <TextBox Text="{Binding NewCustomerEmail}" Background="#0F172A" Foreground="#FFFFFF" Padding="6" Margin="0,2,0,15"/>
+
+                        <Button Content="Register Customer (+50 pts)" Command="{Binding CreateNewCustomerCommand}" Background="#7C3AED" Foreground="#FFFFFF" FontWeight="Bold" Padding="0,10" BorderThickness="0" Cursor="Hand"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Style="{StaticResource CardStyle}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Customer Directory &amp; Loyalty Ledger" FontSize="16" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,0,0,10"/>
+                        <DataGrid Grid.Row="1" ItemsSource="{Binding CustomersDirectory}" AutoGenerateColumns="False" CanUserAddRows="False" Background="#0F172A" RowBackground="#1E293B" Foreground="#FFFFFF" BorderThickness="0" HeadersVisibility="Column" ColumnHeaderStyle="{StaticResource ModernDataGridColumnHeader}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="CUSTOMER NAME" Binding="{Binding Name}" Width="180" FontWeight="SemiBold"/>
+                                <DataGridTextColumn Header="PHONE" Binding="{Binding Phone}" Width="130"/>
+                                <DataGridTextColumn Header="LOYALTY POINTS" Binding="{Binding LoyaltyPoints}" Width="120" FontWeight="Bold"/>
+                                <DataGridTextColumn Header="EMAIL" Binding="{Binding Email}" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- ==================================================== -->
+            <!-- TAB 8: RETURNS & EXCHANGES VIEW -->
+            <!-- ==================================================== -->
+            <Grid Visibility="{Binding IsReturnsActive, Converter={StaticResource BoolToVis}}" Margin="20">
+                <Border Style="{StaticResource CardStyle}">
+                    <StackPanel MaxWidth="600" HorizontalAlignment="Left">
+                        <TextBlock Text="🔄 Return &amp; Exchange / Credit Note Engine" FontSize="18" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,0,0,12"/>
+                        
+                        <Grid Margin="0,0,0,15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" Text="{Binding ReturnInvoiceLookupNo}" FontSize="15" Padding="8" Background="#0F172A" Foreground="#FFFFFF" BorderBrush="#475569"/>
+                            <Button Grid.Column="1" Content="Lookup Invoice" Command="{Binding LookupReturnInvoiceCommand}" Background="#2563EB" Foreground="#FFFFFF" FontWeight="Bold" Padding="14,0" Margin="8,0,0,0" BorderThickness="0" Cursor="Hand"/>
+                        </Grid>
+
+                        <TextBlock Text="Select Item to Return:" Foreground="#94A3B8" FontSize="11"/>
+                        <ComboBox ItemsSource="{Binding ReturnFoundSale.Items}" SelectedItem="{Binding ReturnSelectedItem}" DisplayMemberPath="SKU" Background="#1E293B" Foreground="#FFFFFF" BorderBrush="#475569" Padding="6" Margin="0,2,0,10"/>
+
+                        <TextBlock Text="Return Quantity:" Foreground="#94A3B8" FontSize="11"/>
+                        <TextBox Text="{Binding ReturnQuantity}" Background="#0F172A" Foreground="#FFFFFF" Padding="6" Margin="0,2,0,10"/>
+
+                        <TextBlock Text="Reason for Return:" Foreground="#94A3B8" FontSize="11"/>
+                        <TextBox Text="{Binding ReturnReason}" Background="#0F172A" Foreground="#FFFFFF" Padding="6" Margin="0,2,0,15"/>
+
+                        <Button Content="Process Return &amp; Issue Credit Note" Command="{Binding ProcessReturnCommand}" Background="#DC2626" Foreground="#FFFFFF" FontWeight="Bold" Padding="0,12" BorderThickness="0" Cursor="Hand"/>
+
+                        <TextBlock Text="{Binding CreditNoteResult}" Foreground="#34D399" FontWeight="Bold" FontSize="14" Margin="0,15,0,0"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- ==================================================== -->
+            <!-- TAB 9: ACCOUNTING & EXPENSES VIEW -->
+            <!-- ==================================================== -->
+            <Grid Visibility="{Binding IsAccountingActive, Converter={StaticResource BoolToVis}}" Margin="20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="380"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,15,0">
+                    <StackPanel>
+                        <TextBlock Text="💰 Record Store Expense" FontSize="16" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,0,0,12"/>
+                        <TextBlock Text="Expense Title:" Foreground="#94A3B8" FontSize="11"/>
+                        <TextBox Text="{Binding ExpenseTitle}" Background="#0F172A" Foreground="#FFFFFF" Padding="6" Margin="0,2,0,10"/>
+
+                        <TextBlock Text="Amount (₹):" Foreground="#94A3B8" FontSize="11"/>
+                        <TextBox Text="{Binding ExpenseAmount}" Background="#0F172A" Foreground="#FFFFFF" Padding="6" Margin="0,2,0,10"/>
+
+                        <TextBlock Text="Category / Ledger:" Foreground="#94A3B8" FontSize="11"/>
+                        <TextBox Text="{Binding ExpenseCategory}" Background="#0F172A" Foreground="#FFFFFF" Padding="6" Margin="0,2,0,15"/>
+
+                        <Button Content="Record Expense Voucher" Command="{Binding AddExpenseCommand}" Background="#D97706" Foreground="#FFFFFF" FontWeight="Bold" Padding="0,10" BorderThickness="0" Cursor="Hand"/>
+
+                        <Border Height="1" Background="#334155" Margin="0,15"/>
+                        <TextBlock Text="Trial Balance Verification:" FontSize="13" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,6"/>
+                        <TextBlock Text="{Binding TrialBalanceDebits, StringFormat='Total Debits: ₹{0:N2}'}" Foreground="#FFFFFF"/>
+                        <TextBlock Text="{Binding TrialBalanceCredits, StringFormat='Total Credits: ₹{0:N2}'}" Foreground="#FFFFFF"/>
+                        <TextBlock Text="Status: BALANCED" Foreground="#34D399" FontWeight="Bold" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Style="{StaticResource CardStyle}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Expense Vouchers &amp; Day Book" FontSize="16" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,0,0,10"/>
+                        <DataGrid Grid.Row="1" ItemsSource="{Binding ExpensesList}" AutoGenerateColumns="False" CanUserAddRows="False" Background="#0F172A" RowBackground="#1E293B" Foreground="#FFFFFF" BorderThickness="0" HeadersVisibility="Column" ColumnHeaderStyle="{StaticResource ModernDataGridColumnHeader}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="DATE" Binding="{Binding ExpenseDateUtc, StringFormat='dd-MM-yyyy'}" Width="120"/>
+                                <DataGridTextColumn Header="EXPENSE TITLE" Binding="{Binding Title}" Width="*"/>
+                                <DataGridTextColumn Header="CATEGORY" Binding="{Binding Notes}" Width="140"/>
+                                <DataGridTextColumn Header="AMOUNT" Binding="{Binding Amount, StringFormat='₹{0:N2}'}" Width="120" FontWeight="Bold"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- ==================================================== -->
+            <!-- TAB 10: GST & P/L REPORTS VIEW -->
+            <!-- ==================================================== -->
+            <Grid Visibility="{Binding IsReportsActive, Converter={StaticResource BoolToVis}}" Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- P/L Cards -->
+                <Grid Grid.Row="0" Margin="0,0,0,15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,8,0">
+                        <StackPanel>
+                            <TextBlock Text="TOTAL REVENUE" FontSize="11" Foreground="#94A3B8" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding RptTotalRevenue, StringFormat='₹{0:N2}'}" FontSize="18" FontWeight="Bold" Foreground="#10B981" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="1" Style="{StaticResource CardStyle}" Margin="4,0,8,0">
+                        <StackPanel>
+                            <TextBlock Text="COST OF GOODS (COGS)" FontSize="11" Foreground="#94A3B8" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding RptCogs, StringFormat='₹{0:N2}'}" FontSize="18" FontWeight="Bold" Foreground="#F59E0B" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="2" Style="{StaticResource CardStyle}" Margin="4,0,8,0">
+                        <StackPanel>
+                            <TextBlock Text="GROSS PROFIT" FontSize="11" Foreground="#94A3B8" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding RptGrossProfit, StringFormat='₹{0:N2}'}" FontSize="18" FontWeight="Bold" Foreground="#38BDF8" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="3" Style="{StaticResource CardStyle}" Margin="4,0,0,0">
+                        <StackPanel>
+                            <TextBlock Text="NET PROFIT" FontSize="11" Foreground="#94A3B8" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding RptNetProfit, StringFormat='₹{0:N2}'}" FontSize="18" FontWeight="Bold" Foreground="#34D399" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- GSTR-1 HSN Table -->
+                <Border Grid.Row="1" Style="{StaticResource CardStyle}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="GSTR-1 Indian Apparel GST Slabs (5% &amp; 12% Breakdown)" FontSize="15" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,0,0,10"/>
+                        <DataGrid Grid.Row="1" ItemsSource="{Binding Gstr1HsnSummaries}" AutoGenerateColumns="False" CanUserAddRows="False" Background="#0F172A" RowBackground="#1E293B" Foreground="#FFFFFF" BorderThickness="0" HeadersVisibility="Column" ColumnHeaderStyle="{StaticResource ModernDataGridColumnHeader}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="HSN CODE" Binding="{Binding HsnCode}" Width="120" FontWeight="SemiBold"/>
+                                <DataGridTextColumn Header="DESCRIPTION" Binding="{Binding Description}" Width="*"/>
+                                <DataGridTextColumn Header="QTY" Binding="{Binding TotalQuantity}" Width="80"/>
+                                <DataGridTextColumn Header="TAXABLE VALUE" Binding="{Binding TaxableAmount, StringFormat='₹{0:N2}'}" Width="140"/>
+                                <DataGridTextColumn Header="CGST" Binding="{Binding CgstAmount, StringFormat='₹{0:N2}'}" Width="100"/>
+                                <DataGridTextColumn Header="SGST" Binding="{Binding SgstAmount, StringFormat='₹{0:N2}'}" Width="100"/>
+                                <DataGridTextColumn Header="TOTAL GST" Binding="{Binding TotalTaxAmount, StringFormat='₹{0:N2}'}" Width="120" FontWeight="Bold"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- ==================================================== -->
+            <!-- TAB 11: DATA SYNC CENTER VIEW -->
+            <!-- ==================================================== -->
+            <Grid Visibility="{Binding IsSyncActive, Converter={StaticResource BoolToVis}}" Margin="20">
+                <Border Style="{StaticResource CardStyle}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0" Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="📡 POSRES Offline/Cloud Outbox &amp; Inbox Monitor" FontSize="16" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center"/>
+                            <Button Grid.Column="1" Content="Force Outbox Sync" Command="{Binding ForceSyncCommand}" Background="#2563EB" Foreground="#FFFFFF" FontWeight="Bold" Padding="14,6" BorderThickness="0" Cursor="Hand"/>
+                        </Grid>
+                        <DataGrid Grid.Row="1" ItemsSource="{Binding OutboxList}" AutoGenerateColumns="False" CanUserAddRows="False" Background="#0F172A" RowBackground="#1E293B" Foreground="#FFFFFF" BorderThickness="0" HeadersVisibility="Column" ColumnHeaderStyle="{StaticResource ModernDataGridColumnHeader}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="EVENT ID" Binding="{Binding EventId}" Width="260"/>
+                                <DataGridTextColumn Header="TYPE" Binding="{Binding EventType}" Width="120" FontWeight="SemiBold"/>
+                                <DataGridTextColumn Header="STATUS" Binding="{Binding Status}" Width="100" FontWeight="Bold"/>
+                                <DataGridTextColumn Header="RETRIES" Binding="{Binding RetryCount}" Width="70"/>
+                                <DataGridTextColumn Header="CREATED AT (UTC)" Binding="{Binding CreatedAtUtc, StringFormat='dd-MM-yyyy HH:mm:ss'}" Width="160"/>
+                                <DataGridTextColumn Header="PROCESSED AT (UTC)" Binding="{Binding ProcessedAtUtc, StringFormat='dd-MM-yyyy HH:mm:ss'}" Width="160"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- ==================================================== -->
+            <!-- TAB 12: SETTINGS & HARDWARE VIEW -->
+            <!-- ==================================================== -->
+            <Grid Visibility="{Binding IsSettingsActive, Converter={StaticResource BoolToVis}}" Margin="20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Left Card: Store Profile & License Server -->
+                <Border Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,10,0">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel>
+                            <TextBlock Text="⚙️ Store Profile &amp; License Server" FontSize="18" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,0,0,15"/>
+
+                            <TextBlock Text="Store Legal Name:" Foreground="#94A3B8" FontSize="11"/>
+                            <TextBox Text="{Binding SettingStoreName}" Background="#0F172A" Foreground="#FFFFFF" Padding="6" Margin="0,2,0,10"/>
+
+                            <TextBlock Text="Branch / Showroom Name:" Foreground="#94A3B8" FontSize="11"/>
+                            <TextBox Text="{Binding SettingBranchName}" Background="#0F172A" Foreground="#FFFFFF" Padding="6" Margin="0,2,0,10"/>
+
+                            <TextBlock Text="Store GSTIN:" Foreground="#94A3B8" FontSize="11"/>
+                            <TextBox Text="{Binding SettingGstin}" Background="#0F172A" Foreground="#FFFFFF" Padding="6" Margin="0,2,0,10"/>
+
+                            <TextBlock Text="Hardware Machine Fingerprint (MPOS ID):" Foreground="#94A3B8" FontSize="11"/>
+                            <TextBox Text="{Binding HardwareFingerprint}" IsReadOnly="True" Background="#0F172A" Foreground="#6EE7B7" FontWeight="Bold" Padding="6" Margin="0,2,0,10"/>
+
+                            <TextBlock Text="Central License Server URL:" Foreground="#94A3B8" FontSize="11"/>
+                            <TextBox Text="{Binding LicenseServerUrl}" IsReadOnly="True" Background="#0F172A" Foreground="#38BDF8" FontWeight="SemiBold" Padding="6" Margin="0,2,0,15"/>
+
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Button Grid.Column="0" Content="🔐 Verify Online License" Command="{Binding VerifyOnlineLicenseCommand}" Background="#0284C7" Foreground="#FFFFFF" FontWeight="Bold" Padding="0,10" Margin="0,0,5,0" BorderThickness="0" Cursor="Hand"/>
+                                <Button Grid.Column="1" Content="💾 Encrypted Backup" Command="{Binding CreateBackupSnapshotCommand}" Background="#059669" Foreground="#FFFFFF" FontWeight="Bold" Padding="0,10" Margin="5,0,0,0" BorderThickness="0" Cursor="Hand"/>
+                            </Grid>
+
+                            <Button Content="Test License Server Telemetry" Command="{Binding TestErrorTelemetryCommand}" Background="#4F46E5" Foreground="#FFFFFF" FontWeight="Bold" Padding="0,8" Margin="0,0,0,10" BorderThickness="0" Cursor="Hand"/>
+
+                            <TextBlock Text="{Binding SettingStatusMessage}" Foreground="#34D399" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Border>
+
+                <!-- Right Card: Telegram Bot Integration -->
+                <Border Grid.Column="1" Style="{StaticResource CardStyle}" Margin="10,0,0,0">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel>
+                            <TextBlock Text="✈️ Telegram Bot Alert Integration" FontSize="18" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,0,0,6"/>
+                            <TextBlock Text="Real-time instant notifications directly to store owner's Telegram app for sales, cashier shifts, stock, and errors." FontSize="12" Foreground="#94A3B8" TextWrapping="Wrap" Margin="0,0,0,15"/>
+
+                            <TextBlock Text="Telegram Bot Token:" Foreground="#94A3B8" FontSize="11"/>
+                            <TextBox Text="{Binding TelegramBotToken, UpdateSourceTrigger=PropertyChanged}" Background="#0F172A" Foreground="#FFFFFF" Padding="6" Margin="0,2,0,10"/>
+
+                            <TextBlock Text="Telegram Chat ID:" Foreground="#94A3B8" FontSize="11"/>
+                            <TextBox Text="{Binding TelegramChatId, UpdateSourceTrigger=PropertyChanged}" Background="#0F172A" Foreground="#FFFFFF" Padding="6" Margin="0,2,0,15"/>
+
+                            <Button Content="🔔 Send Test Alert to Telegram" Command="{Binding TestTelegramBotCommand}" Background="#2563EB" Foreground="#FFFFFF" FontSize="14" FontWeight="Bold" Padding="0,12" Margin="0,0,0,15" BorderThickness="0" Cursor="Hand"/>
+
+                            <TextBlock Text="{Binding TelegramStatusMessage}" Foreground="#F59E0B" FontWeight="Bold" FontSize="13" TextWrapping="Wrap" Margin="0,0,0,15"/>
+
+                            <Border Background="#0F172A" CornerRadius="6" Padding="12" BorderBrush="#334155" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="📱 Automatic Alerts Triggered:" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,6"/>
+                                    <TextBlock Text="• 🟢 POS App Startup &amp; Counter Online" Foreground="#CBD5E1" Margin="0,2"/>
+                                    <TextBlock Text="• 🧾 Live Bill Completed (Invoice #, Total ₹, Items, Payment)" Foreground="#CBD5E1" Margin="0,2"/>
+                                    <TextBlock Text="• 📊 Shift Closing Z-Report (Sales &amp; Cash Breakdown)" Foreground="#CBD5E1" Margin="0,2"/>
+                                    <TextBlock Text="• 🚨 DataSync Error &amp; Network Outage Warning" Foreground="#CBD5E1" Margin="0,2"/>
+                                    <TextBlock Text="• ⚠️ Application Crash Telemetry to License Server" Foreground="#CBD5E1" Margin="0,2"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Border>
+            </Grid>
+
+        </Grid>
+
+        <!-- ======================================================== -->
+        <!-- ROW 3: FOOTER STATUS BAR & KEYPAD LEGEND -->
+        <!-- ======================================================== -->
+        <Border Grid.Row="3" Background="#0F172A" BorderBrush="#1E293B" BorderThickness="0,1,0,0" Padding="15,0">
+            <Grid VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Text="{Binding StatusMessage}" FontSize="12" FontWeight="SemiBold" Foreground="#38BDF8" VerticalAlignment="Center"/>
+
+                <TextBlock Grid.Column="1" Text="F1 Search | F2 POS | F4 Discount | F5 Customer | F6 Hold | F7 Resume | F9 Split | F10 Cash | F11 Z-Report | F12 Re-print" FontSize="11" Foreground="#94A3B8" VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+
+        <!-- ======================================================== -->
+        <!-- POPUP MODALS & DIALOGS -->
+        <!-- ======================================================== -->
+
+        <!-- MODAL: FAST PRODUCT & VARIANT SEARCH (F1) -->
+        <Grid Background="#CC000000" Grid.Row="0" Grid.RowSpan="4" Panel.ZIndex="100" Visibility="{Binding IsProductSearchModalOpen, Converter={StaticResource BoolToVis}}">
+            <Border Background="#1E293B" CornerRadius="10" Width="960" Height="620" Padding="24" BorderBrush="#334155" BorderThickness="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <!-- Title & Close -->
+                        <RowDefinition Height="Auto"/>
+                        <!-- Instant Search Bar -->
+                        <RowDefinition Height="Auto"/>
+                        <!-- Filtered Results Table -->
+                        <RowDefinition Height="*"/>
+                        <!-- Footer -->
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Row 0: Title & Help -->
+                    <Grid Grid.Row="0" Margin="0,0,0,14">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="🔍 Fast Product &amp; Variant Search (F1)" FontSize="18" FontWeight="Bold" Foreground="#FFFFFF"/>
+                            <TextBlock Text="Instant live search across all products, sizes, colors, SKUs, and barcodes." FontSize="12" Foreground="#94A3B8" Margin="0,3,0,0"/>
+                        </StackPanel>
+                        <Button Grid.Column="1" Content="✕" Command="{Binding OpenProductSearchModalCommand}" Background="Transparent" Foreground="#94A3B8" FontSize="18" FontWeight="Bold" BorderThickness="0" Cursor="Hand" Padding="8,2" VerticalAlignment="Top"/>
+                    </Grid>
+
+                    <!-- Row 1: Instant Search Box -->
+                    <Border Grid.Row="1" Background="#0F172A" CornerRadius="6" BorderBrush="#38BDF8" BorderThickness="1.5" Padding="4" Margin="0,0,0,14">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="🔎" FontSize="16" Foreground="#38BDF8" VerticalAlignment="Center" Margin="10,0,8,0"/>
+                            <TextBox x:Name="TxtProductSearchInput" Grid.Column="1" Text="{Binding ProductSearchQuery, UpdateSourceTrigger=PropertyChanged}" FontSize="15" FontWeight="SemiBold" Background="Transparent" Foreground="#FFFFFF" BorderThickness="0" VerticalContentAlignment="Center" Padding="4,8" KeyDown="TxtProductSearchInput_KeyDown"/>
+                            <TextBlock Grid.Column="2" Text="{Binding SearchFilteredVariants.Count, StringFormat='{}{0} items found'}" FontSize="12" FontWeight="SemiBold" Foreground="#38BDF8" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Row 2: Results Table -->
+                    <Border Grid.Row="2" Background="#0F172A" CornerRadius="6" BorderBrush="#334155" BorderThickness="1">
+                        <DataGrid ItemsSource="{Binding SearchFilteredVariants}" AutoGenerateColumns="False" CanUserAddRows="False" Background="#0F172A" RowBackground="#1E293B" AlternatingRowBackground="#162032" Foreground="#FFFFFF" BorderThickness="0" HeadersVisibility="Column" ColumnHeaderStyle="{StaticResource ModernDataGridColumnHeader}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="SKU" Binding="{Binding SKU}" Width="150" FontWeight="SemiBold"/>
+                                <DataGridTextColumn Header="BARCODE" Binding="{Binding Barcode}" Width="140"/>
+                                <DataGridTextColumn Header="PRODUCT NAME" Binding="{Binding ProductName}" Width="*"/>
+                                <DataGridTextColumn Header="SIZE" Binding="{Binding SizeName}" Width="80"/>
+                                <DataGridTextColumn Header="COLOR" Binding="{Binding ColorName}" Width="90"/>
+                                <DataGridTextColumn Header="PRICE" Binding="{Binding SellingPrice, StringFormat='₹{0:N2}'}" Width="95" FontWeight="SemiBold"/>
+                                <DataGridTemplateColumn Header="STOCK" Width="100">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border CornerRadius="4" Padding="6,2" HorizontalAlignment="Center" Background="#064E3B">
+                                                <TextBlock Text="{Binding StockQty, StringFormat='{}{0} in stock'}" FontSize="11" FontWeight="Bold" Foreground="#34D399"/>
+                                            </Border>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn Width="110">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Content="+ Add Cart" Command="{Binding DataContext.AddVariantToCartFromSearchCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" Background="#2563EB" Foreground="#FFFFFF" FontWeight="Bold" Padding="10,4" BorderThickness="0" Cursor="Hand"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+
+                    <!-- Row 3: Footer -->
+                    <Grid Grid.Row="3" Margin="0,14,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="💡 Type to filter in real-time. Press Enter to add first match. Click '+ Add Cart' or press Escape to close." FontSize="11" Foreground="#64748B" VerticalAlignment="Center"/>
+                        <Button Grid.Column="1" Content="Close Search (Esc)" Command="{Binding OpenProductSearchModalCommand}" Background="#334155" Foreground="#FFFFFF" FontWeight="SemiBold" Padding="16,8" BorderThickness="0" Cursor="Hand"/>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- MODAL: SPLIT PAYMENT (F9) -->
+        <Grid Background="#CC000000" Grid.Row="0" Grid.RowSpan="4" Panel.ZIndex="100" Visibility="{Binding IsPaymentModalOpen, Converter={StaticResource BoolToVis}}">
+            <Border Background="#1E293B" CornerRadius="8" Width="500" Padding="20" VerticalAlignment="Center" BorderBrush="#334155" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="💳 Split / Multi-Tender Checkout (F9)" FontSize="18" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,0,0,12"/>
+                    <TextBlock Text="{Binding GrandTotal, StringFormat='Net Payable: ₹{0:N2}'}" FontSize="20" FontWeight="Bold" Foreground="#10B981" Margin="0,0,0,12"/>
+
+                    <TextBlock Text="Cash Amount:" Foreground="#94A3B8" FontSize="11"/>
+                    <TextBox Text="{Binding TenderCash, UpdateSourceTrigger=PropertyChanged}" Background="#0F172A" Foreground="#FFFFFF" FontSize="16" Padding="6" Margin="0,2,0,10"/>
+
+                    <TextBlock Text="Card Amount:" Foreground="#94A3B8" FontSize="11"/>
+                    <TextBox Text="{Binding TenderCard, UpdateSourceTrigger=PropertyChanged}" Background="#0F172A" Foreground="#FFFFFF" FontSize="16" Padding="6" Margin="0,2,0,10"/>
+
+                    <TextBlock Text="UPI Amount:" Foreground="#94A3B8" FontSize="11"/>
+                    <TextBox Text="{Binding TenderUpi, UpdateSourceTrigger=PropertyChanged}" Background="#0F172A" Foreground="#FFFFFF" FontSize="16" Padding="6" Margin="0,2,0,15"/>
+
+                    <TextBlock Text="{Binding SplitPaymentSummary}" Foreground="#F59E0B" FontWeight="SemiBold" Margin="0,0,0,15"/>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" Content="Confirm Payment" Command="{Binding ConfirmSplitPaymentCommand}" Background="#059669" Foreground="#FFFFFF" FontWeight="Bold" Padding="0,10" Margin="0,0,5,0" BorderThickness="0" Cursor="Hand"/>
+                        <Button Grid.Column="1" Content="Cancel" Command="{Binding OpenSplitPaymentModalCommand}" Background="#475569" Foreground="#FFFFFF" FontWeight="Bold" Padding="0,10" Margin="5,0,0,0" BorderThickness="0" Cursor="Hand"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- MODAL: THERMAL RECEIPT PREVIEW (80mm) -->
+        <Grid Background="#CC000000" Grid.Row="0" Grid.RowSpan="4" Panel.ZIndex="100" Visibility="{Binding IsReceiptModalOpen, Converter={StaticResource BoolToVis}}">
+            <Border Background="#1E293B" CornerRadius="8" Width="450" Height="600" Padding="20" BorderBrush="#334155" BorderThickness="1">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="🖨 ESC/POS 80mm Thermal Receipt Preview" FontSize="14" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,0,0,10"/>
+                    <Border Grid.Row="1" Background="#0F172A" CornerRadius="6" BorderBrush="#334155" BorderThickness="1">
+                        <ScrollViewer Padding="15">
+                            <TextBlock Text="{Binding ReceiptPreviewText}" FontFamily="Consolas, Courier New" FontSize="12" Foreground="#F8FAFC"/>
+                        </ScrollViewer>
+                    </Border>
+                    <Button Grid.Row="2" Content="Close Receipt" Command="{Binding CloseReceiptModalCommand}" Background="#2563EB" Foreground="#FFFFFF" FontWeight="Bold" Padding="0,8" Margin="0,10,0,0" BorderThickness="0" Cursor="Hand"/>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- MODAL: SHIFT Z-REPORT (F11) -->
+        <Grid Background="#CC000000" Grid.Row="0" Grid.RowSpan="4" Panel.ZIndex="100" Visibility="{Binding IsZReportModalOpen, Converter={StaticResource BoolToVis}}">
+            <Border Background="#1E293B" CornerRadius="8" Width="450" Height="600" Padding="20" BorderBrush="#334155" BorderThickness="1">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="📊 Day-End Cashier Shift Z-Report" FontSize="14" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,0,0,10"/>
+                    <Border Grid.Row="1" Background="#0F172A" CornerRadius="6" BorderBrush="#334155" BorderThickness="1">
+                        <ScrollViewer Padding="15">
+                            <TextBlock Text="{Binding ZReportText}" FontFamily="Consolas, Courier New" FontSize="12" Foreground="#F8FAFC"/>
+                        </ScrollViewer>
+                    </Border>
+                    <Button Grid.Row="2" Content="Close Z-Report" Command="{Binding CloseZReportModalCommand}" Background="#2563EB" Foreground="#FFFFFF" FontWeight="Bold" Padding="0,8" Margin="0,10,0,0" BorderThickness="0" Cursor="Hand"/>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- MODAL: ANDROID WIFI MOBILE SCANNER SETUP -->
+        <Grid Background="#CC000000" Grid.Row="0" Grid.RowSpan="4" Panel.ZIndex="100" Visibility="{Binding IsMobileScannerModalOpen, Converter={StaticResource BoolToVis}}">
+            <Border Background="#1E293B" CornerRadius="10" Width="680" Padding="24" BorderBrush="#334155" BorderThickness="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Header -->
+                    <Grid Grid.Row="0" Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="📱 Connect Android Phone as WiFi Barcode Scanner" FontSize="18" FontWeight="Bold" Foreground="#FFFFFF"/>
+                            <TextBlock Text="Turns your smartphone camera into a wireless laser barcode scanner for this POS." FontSize="12" Foreground="#94A3B8" Margin="0,3,0,0"/>
+                        </StackPanel>
+                        <Button Grid.Column="1" Content="✕" Command="{Binding CloseMobileScannerSetupCommand}" Background="Transparent" Foreground="#94A3B8" FontSize="18" FontWeight="Bold" BorderThickness="0" Cursor="Hand" Padding="8,2" VerticalAlignment="Top"/>
+                    </Grid>
+
+                    <!-- Body: QR Code & Connection Details -->
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="230"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Left: Big QR Code Image -->
+                        <Border Grid.Column="0" Background="#FFFFFF" CornerRadius="8" Padding="12" VerticalAlignment="Top" HorizontalAlignment="Center" BorderBrush="#38BDF8" BorderThickness="2">
+                            <Image Source="{Binding MobileScannerQrImage}" Width="190" Height="190" Stretch="Uniform"/>
+                        </Border>
+
+                        <!-- Right: Steps & Status -->
+                        <StackPanel Grid.Column="1" Margin="20,0,0,0">
+                            <TextBlock Text="EASY 2-STEP PAIRING:" FontWeight="Bold" FontSize="13" Foreground="#38BDF8" Margin="0,0,0,8"/>
+
+                            <Border Background="#0F172A" CornerRadius="6" Padding="10" Margin="0,0,0,8" BorderBrush="#334155" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="1. Connect phone to the same Wi-Fi network as this PC." FontSize="12" Foreground="#E2E8F0"/>
+                                    <TextBlock Text="2. Scan the QR code with phone camera, or open URL in Chrome:" FontSize="12" Foreground="#E2E8F0" Margin="0,4,0,4"/>
+                                    <TextBox Text="{Binding MobileScannerUrl}" IsReadOnly="True" FontSize="13" FontWeight="Bold" Foreground="#38BDF8" Background="#1E293B" BorderBrush="#475569" Padding="6,4"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="#0F172A" CornerRadius="6" Padding="10" Margin="0,0,0,10" BorderBrush="#334155" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="PHONE CONNECTION STATUS:" FontSize="11" FontWeight="Bold" Foreground="#94A3B8"/>
+                                    <TextBlock Text="{Binding ConnectedMobileDevice}" FontSize="13" FontWeight="Bold" Foreground="#34D399" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+
+                            <TextBlock Text="DEMO TESTING (Instant 1-Click Simulation):" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,4,0,6"/>
+                            <WrapPanel>
+                                <Button Content="👕 Slim Shirt S" Command="{Binding SimulateBarcodeScanCommand}" CommandParameter="8900327943047" Background="#2563EB" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="11" Padding="8,4" Margin="0,0,6,6" BorderThickness="0" Cursor="Hand"/>
+                                <Button Content="👕 Slim Shirt XL" Command="{Binding SimulateBarcodeScanCommand}" CommandParameter="8900734656318" Background="#2563EB" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="11" Padding="8,4" Margin="0,0,6,6" BorderThickness="0" Cursor="Hand"/>
+                                <Button Content="👕 Casual Shirt L" Command="{Binding SimulateBarcodeScanCommand}" CommandParameter="8900450996935" Background="#2563EB" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="11" Padding="8,4" Margin="0,0,6,6" BorderThickness="0" Cursor="Hand"/>
+                            </WrapPanel>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Footer -->
+                    <Grid Grid.Row="2" Margin="0,16,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="💡 Tip: In Mobile Chrome, if live video is restricted on Wi-Fi HTTP, tap 'Install APK' or enable Chrome flag: unsafely-treat-insecure-origin-as-secure." FontSize="11" Foreground="#94A3B8" VerticalAlignment="Center"/>
+                        <Button Grid.Column="1" Content="Done / Close" Command="{Binding CloseMobileScannerSetupCommand}" Background="#334155" Foreground="#FFFFFF" FontWeight="SemiBold" Padding="16,8" BorderThickness="0" Cursor="Hand"/>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- MODAL: PRODUCT SKU BARCODE LABEL & PRINT -->
+        <Grid Background="#CC000000" Grid.Row="0" Grid.RowSpan="4" Panel.ZIndex="100" Visibility="{Binding IsBarcodeLabelModalOpen, Converter={StaticResource BoolToVis}}">
+            <Border Background="#1E293B" CornerRadius="10" Width="520" Padding="24" BorderBrush="#334155" BorderThickness="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Header -->
+                    <Grid Grid.Row="0" Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="🏷 Product SKU Barcode &amp; Hang Tag Label" FontSize="18" FontWeight="Bold" Foreground="#FFFFFF"/>
+                            <TextBlock Text="Official retail price tag with SKU, Size, Color, MRP, and EAN-13/Code-128 barcode." FontSize="12" Foreground="#94A3B8" Margin="0,3,0,0"/>
+                        </StackPanel>
+                        <Button Grid.Column="1" Content="✕" Command="{Binding CloseBarcodeLabelModalCommand}" Background="Transparent" Foreground="#94A3B8" FontSize="18" FontWeight="Bold" BorderThickness="0" Cursor="Hand" Padding="8,2" VerticalAlignment="Top"/>
+                    </Grid>
+
+                    <!-- Body: Visual Hang Tag Preview -->
+                    <StackPanel Grid.Row="1">
+                        <Border Background="#FFFFFF" CornerRadius="8" Padding="10" HorizontalAlignment="Center" BorderBrush="#475569" BorderThickness="1.5" Margin="0,0,0,12">
+                            <Image Source="{Binding BarcodeLabelPreviewImage}" Width="420" Height="300" Stretch="Uniform"/>
+                        </Border>
+                        <TextBlock Text="{Binding BarcodeLabelPrintStatus}" Foreground="#34D399" FontWeight="SemiBold" FontSize="12" HorizontalAlignment="Center"/>
+                    </StackPanel>
+
+                    <!-- Footer / Print Action Buttons -->
+                    <Grid Grid.Row="2" Margin="0,16,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="1" Content="🖨 Print 50×35mm Tag" Command="{Binding PrintBarcodeLabelCommand}" Background="#2563EB" Foreground="#FFFFFF" FontWeight="Bold" Padding="14,8" BorderThickness="0" Cursor="Hand" Margin="0,0,10,0"/>
+                        <Button Grid.Column="2" Content="Close" Command="{Binding CloseBarcodeLabelModalCommand}" Background="#334155" Foreground="#FFFFFF" FontWeight="SemiBold" Padding="14,8" BorderThickness="0" Cursor="Hand"/>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- MODAL: RESUME HELD BILLS (F7) -->
+        <Grid Background="#CC000000" Grid.Row="0" Grid.RowSpan="4" Panel.ZIndex="100" Visibility="{Binding IsHeldBillsModalOpen, Converter={StaticResource BoolToVis}}">
+            <Border Background="#1E293B" CornerRadius="10" Width="600" Padding="24" BorderBrush="#334155" BorderThickness="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0" Margin="0,0,0,14">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="⏸ Held Bills Manager (F7)" FontSize="18" FontWeight="Bold" Foreground="#FFFFFF"/>
+                        <Button Grid.Column="1" Content="✕" Command="{Binding CloseHeldBillsModalCommand}" Background="Transparent" Foreground="#94A3B8" FontSize="18" FontWeight="Bold" BorderThickness="0" Cursor="Hand" Padding="8,2" VerticalAlignment="Top"/>
+                    </Grid>
+                    <Border Grid.Row="1" Background="#0F172A" CornerRadius="6" BorderBrush="#334155" BorderThickness="1" MinHeight="180">
+                        <ListBox ItemsSource="{Binding HeldBills}" Background="Transparent" BorderThickness="0">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="#1E293B" CornerRadius="6" Padding="12" Margin="4,3" BorderBrush="#334155" BorderThickness="1">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0">
+                                                <TextBlock Text="{Binding CustomerName}" FontWeight="Bold" FontSize="14" Foreground="#FFFFFF"/>
+                                                <TextBlock Text="{Binding HeldAt, StringFormat='Held at: {0:HH:mm:ss} | {1} items'}" FontSize="12" Foreground="#94A3B8" Margin="0,3,0,0"/>
+                                                <TextBlock Text="{Binding TotalAmount, StringFormat='Total: ₹{0:N2}'}" FontWeight="Bold" FontSize="13" Foreground="#10B981" Margin="0,2,0,0"/>
+                                            </StackPanel>
+                                            <Button Grid.Column="1" Content="▶ Resume Bill" Command="{Binding DataContext.ResumeHeldBillCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" Background="#2563EB" Foreground="#FFFFFF" FontWeight="Bold" Padding="14,6" BorderThickness="0" Cursor="Hand" VerticalAlignment="Center"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Border>
+                    <Button Grid.Row="2" Content="Close" Command="{Binding CloseHeldBillsModalCommand}" Background="#334155" Foreground="#FFFFFF" FontWeight="SemiBold" Padding="16,8" Margin="0,14,0,0" BorderThickness="0" Cursor="Hand" HorizontalAlignment="Right"/>
+                </Grid>
+            </Border>
+        </Grid>
+
+    </Grid>
+</Window>

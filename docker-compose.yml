@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  garment-postgres:
+    image: postgres:16-alpine
+    container_name: garment-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: garment_erp
+      POSTGRES_USER: erp_user
+      POSTGRES_PASSWORD: erp_secure_password_2026
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U erp_user -d garment_erp"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  garment-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: garment-api
+    restart: always
+    depends_on:
+      garment-postgres:
+        condition: service_healthy
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__PostgresConnection=Host=garment-postgres;Port=5432;Database=garment_erp;Username=erp_user;Password=erp_secure_password_2026;
+      - ConnectionStrings__SqliteConnection=Data Source=/app/data/garment_offline.db
+    ports:
+      - "5000:8080"
+    volumes:
+      - api_data:/app/data
+
+volumes:
+  postgres_data:
+  api_data:

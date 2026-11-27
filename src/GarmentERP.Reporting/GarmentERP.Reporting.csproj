@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\GarmentERP.Domain\GarmentERP.Domain.csproj" />
+    <ProjectReference Include="..\GarmentERP.Application\GarmentERP.Application.csproj" />
+    <ProjectReference Include="..\GarmentERP.Shared\GarmentERP.Shared.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\GarmentERP.Domain\GarmentERP.Domain.csproj" />
+    <ProjectReference Include="..\..\src\GarmentERP.Application\GarmentERP.Application.csproj" />
+    <ProjectReference Include="..\..\src\GarmentERP.Shared\GarmentERP.Shared.csproj" />
+    <ProjectReference Include="..\..\src\GarmentERP.Infrastructure\GarmentERP.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\GarmentERP.Reporting\GarmentERP.Reporting.csproj" />
+  </ItemGroup>
+
+</Project>

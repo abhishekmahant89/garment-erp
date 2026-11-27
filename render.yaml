@@ -1,0 +1,24 @@
+databases:
+  - name: garmenterp-db
+    databaseName: garmenterp
+    user: garmentuser
+    plan: free
+    region: singapore
+
+services:
+  - type: web
+    name: garmenterp-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: singapore
+    healthCheckPath: /
+    envVars:
+      - key: ConnectionStrings__PostgresConnection
+        fromDatabase:
+          name: garmenterp-db
+          property: connectionString
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://+:8080

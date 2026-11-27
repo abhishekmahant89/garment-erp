@@ -1,0 +1,24 @@
+## .NET Core & EF Core
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Database & Local Data
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+publish/
+*.tmp
+garment_active_cart_snapshot.json
+
+## OS & IDE
+.vscode/
+.vs/
+.idea/
+Thumbs.db
+[Dd]esktop.ini
